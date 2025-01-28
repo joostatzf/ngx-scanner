@@ -4,6 +4,7 @@ import { BarcodeFormat } from '@zxing/library';
 import { BehaviorSubject } from 'rxjs';
 import { FormatsDialogComponent } from './formats-dialog/formats-dialog.component';
 import { AppInfoDialogComponent } from './app-info-dialog/app-info-dialog.component';
+import { getCameraWithClosestFocus } from './camera-util';
 
 @Component({
     selector: 'app-root',
@@ -33,7 +34,16 @@ export class AppComponent {
   torchAvailable$ = new BehaviorSubject<boolean>(false);
   tryHarder = false;
 
-  constructor(private readonly _dialog: MatDialog) { }
+  scannerEnabled = false;
+
+  constructor(private readonly _dialog: MatDialog) {
+    getCameraWithClosestFocus().then(cameraid => {
+      console.log(`cameresWithFocus: ${JSON.stringify(cameraid)}`);
+      const device = this.availableDevices.find(x => x.deviceId === cameraid);
+      this.deviceCurrent = device || undefined;
+      this.scannerEnabled = true;
+      });
+  }
 
   clearResult(): void {
     this.qrResultString = null;
@@ -41,11 +51,24 @@ export class AppComponent {
 
   onCamerasFound(devices: MediaDeviceInfo[]): void {
     this.availableDevices = devices;
+    console.log(`availableDevices: ${JSON.stringify(devices)}`);
     this.hasDevices = Boolean(devices && devices.length);
   }
 
   onCodeResult(resultString: string) {
     this.qrResultString = resultString;
+  }
+
+  onScanFailure() {
+    console.log(`scanFailure`);
+  }
+
+  onScanError(resultString: any) {
+    // console.log(`scanError: ${JSON.stringify(resultString)}`);
+  }
+
+  onScanComplete(resultString: any) {
+    // console.log(`scanComplete: ${JSON.stringify(resultString)}`);
   }
 
   onDeviceSelectChange(selected: string) {
@@ -60,6 +83,7 @@ export class AppComponent {
     const selectedStr = device?.deviceId || '';
     if (this.deviceSelected === selectedStr) { return; }
     this.deviceSelected = selectedStr;
+    console.log(`deviceSelected: ${JSON.stringify(selectedStr)}`);
     this.deviceCurrent = device || undefined;
   }
 
@@ -97,9 +121,11 @@ export class AppComponent {
 
   toggleTorch(): void {
     this.torchEnabled = !this.torchEnabled;
+    console.log(`toggleTorch: ${this.torchEnabled}`);
   }
 
   toggleTryHarder(): void {
     this.tryHarder = !this.tryHarder;
+    console.log(`tryHarder:${this.tryHarder}`);
   }
 }
