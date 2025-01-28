@@ -80,12 +80,10 @@
 <ng-container>
   <h2>Current device</h2>
   <blockquote>
-    <small>All</small>
     {{ JSON.stringify(this.deviceCurrent, null, 2) }}
   </blockquote>
-  <h2>All device</h2>
+  <h2>All devices</h2>
   <div>
-    <small>navigator</small>
     <strong>{{ JSON.stringify(this.allNavigatorDevices, null, 2)}}</strong>
   </div>
 </ng-container>
