@@ -36,7 +36,14 @@ export class AppComponent {
 
   scannerEnabled = false;
 
+  allNavigatorDevices = null;
+
   constructor(private readonly _dialog: MatDialog) {
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+        this.allNavigatorDevices = devices;
+        console.log(`enumerateDevices: ${devices}`);
+      }
+    );
     getCameraWithClosestFocus().then(cameraid => {
       console.log(`cameresWithFocus: ${JSON.stringify(cameraid)}`);
       const device = this.availableDevices.find(x => x.deviceId === cameraid);
@@ -128,4 +135,6 @@ export class AppComponent {
     this.tryHarder = !this.tryHarder;
     console.log(`tryHarder:${this.tryHarder}`);
   }
+
+  protected readonly JSON = JSON;
 }
